@@ -1,0 +1,162 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "mount_file_id": "1nuBNZcJr5x3Sp1910bcVjnMUuwQbaU0k",
+      "authorship_tag": "ABX9TyOGAVbdFwsEjYsxuAWU1Cpi",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/mishaboldurev1410-png/AdguardFilters/blob/master/bot_%D1%80%D1%83\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!pip install --upgrade urllib3 requests -q\n",
+        "import importlib, sys\n",
+        "\n",
+        "# Принудительно перезагружаем urllib3 и requests\n",
+        "for mod in list(sys.modules.keys()):\n",
+        "    if \"urllib3\" in mod or \"requests\" in mod:\n",
+        "        del sys.modules[mod]\n",
+        "\n",
+        "print(\"✅ Готово, теперь запускайте ячейку 2\")"
+      ],
+      "metadata": {
+        "id": "ClfWJlA57rBd",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "a72c8d4b-59b3-4728-9c05-49bc661581f9"
+      },
+      "execution_count": 1,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "\u001b[?25l   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m0.0/131.1 kB\u001b[0m \u001b[31m?\u001b[0m eta \u001b[36m-:--:--\u001b[0m\r\u001b[2K   \u001b[91m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[90m╺\u001b[0m\u001b[90m━━\u001b[0m \u001b[32m122.9/131.1 kB\u001b[0m \u001b[31m7.6 MB/s\u001b[0m eta \u001b[36m0:00:01\u001b[0m\r\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m131.1/131.1 kB\u001b[0m \u001b[31m3.1 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25h\u001b[?25l   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m0.0/73.1 kB\u001b[0m \u001b[31m?\u001b[0m eta \u001b[36m-:--:--\u001b[0m\r\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m73.1/73.1 kB\u001b[0m \u001b[31m2.6 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25h\u001b[31mERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.\n",
+            "google-colab 1.0.0 requires requests==2.32.4, but you have requests 2.34.2 which is incompatible.\u001b[0m\u001b[31m\n",
+            "\u001b[0m✅ Готово, теперь запускайте ячейку 2\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "id": "DRkvAQTbkUeP"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import importlib\n",
+        "import urllib3\n",
+        "import requests\n",
+        "import pandas as pd\n",
+        "import time\n",
+        "\n",
+        "APP_ID  = 570060128\n",
+        "COUNTRY = \"ru\"\n",
+        "\n",
+        "print(f\"🔑 App ID  : {APP_ID}\")\n",
+        "print(f\"🌍 Страна  : {COUNTRY}\\n\")\n",
+        "\n",
+        "all_reviews = []\n",
+        "\n",
+        "for page in range(1, 11):\n",
+        "    url = (\n",
+        "        f\"https://itunes.apple.com/{COUNTRY}/rss/customerreviews/\"\n",
+        "        f\"page={page}/id={APP_ID}/sortby=mostrecent/json\"\n",
+        "    )\n",
+        "\n",
+        "    try:\n",
+        "        resp = requests.get(url, timeout=15)\n",
+        "    except Exception as e:\n",
+        "        print(f\"Ошибка на странице {page}: {e}\")\n",
+        "        break\n",
+        "\n",
+        "    if resp.status_code != 200:\n",
+        "        print(f\"Страница {page}: статус {resp.status_code}, останавливаемся.\")\n",
+        "        break\n",
+        "\n",
+        "    data = resp.json()\n",
+        "    entries = data.get(\"feed\", {}).get(\"entry\", [])\n",
+        "\n",
+        "    if page == 1 and entries:\n",
+        "        entries = entries[1:]  # первый entry — метаданные приложения\n",
+        "\n",
+        "    if not entries:\n",
+        "        print(f\"Страница {page}: отзывов больше нет.\")\n",
+        "        break\n",
+        "\n",
+        "    for e in entries:\n",
+        "        try:\n",
+        "            all_reviews.append({\n",
+        "                \"date\":   e[\"updated\"][\"label\"][:10],\n",
+        "                \"rating\": int(e[\"im:rating\"][\"label\"]),\n",
+        "                \"review\": e[\"content\"][\"label\"]\n",
+        "            })\n",
+        "        except (KeyError, ValueError):\n",
+        "            continue\n",
+        "\n",
+        "    print(f\"Страница {page}: +{len(entries)} отзывов (всего: {len(all_reviews)})\")\n",
+        "    time.sleep(0.5)\n",
+        "\n",
+        "# ── Сохранение ──\n",
+        "if not all_reviews:\n",
+        "    print(\"⚠️  Отзывы не найдены.\")\n",
+        "else:\n",
+        "    df = pd.DataFrame(all_reviews)[[\"date\", \"rating\", \"review\"]]\n",
+        "    df.to_csv(\"reviews.csv\", index=False, encoding=\"utf-8-sig\")\n",
+        "    print(f\"\\n✅ Собрано отзывов : {len(df)}\")\n",
+        "    print(f\"💾 Файл сохранён  : reviews.csv\")"
+      ],
+      "metadata": {
+        "id": "GKPJzHZS7rNx",
+        "outputId": "8a1d4dd2-052a-4adf-f2fc-9a00ba17ed4e",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        }
+      },
+      "execution_count": 2,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "🔑 App ID  : 570060128\n",
+            "🌍 Страна  : ru\n",
+            "\n",
+            "Страница 1: отзывов больше нет.\n",
+            "⚠️  Отзывы не найдены.\n"
+          ]
+        }
+      ]
+    }
+  ]
+}
